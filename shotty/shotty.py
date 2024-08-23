@@ -108,10 +108,20 @@ def create_snapshot(project):
     instances = filter_instances(project)
     
     for i in instances:
+        print("Stopping VM to snapshots of {0}".format(i.id))
+        i.stop()  #stop the vm 
+        i.wait_until_stopped()
     
         for v in i.volumes.all():
             print("Creating snapshots of {0}".format(v.id))
             v.create_snapshot(Description="created from Analyzer30000 ")
+            
+            print("Starting after  snapshots of {0}".format(v.id))  
+            
+            i.start() 
+            i.wait_until_running() #important feature to avoid a mess with the servers
+            print("Running server after  snapshots of {0}".format(i.id))  
+    return
     
 
 @instances.command('list')  #a pertenece a cli.group('instances')  
@@ -155,7 +165,7 @@ def stop_instances(project):
         
     for i in instances:
         print("Starting {0}" .format(i.id))
-        i.start() #here we send the command to stop 
+        i.start() #here we send the command to start 
         
     return
 #-------------THIS IS Instances Group ------------------------------------------------#---------------
