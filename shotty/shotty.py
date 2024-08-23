@@ -1,4 +1,6 @@
+import botocore.exceptions
 import boto3
+import botocore
 import click
 
 
@@ -99,6 +101,9 @@ def list_volumes(project):
 def instances():
     "Commands for instances"
 
+
+
+############ this is to create snampshot#################
 @instances.command('snapshot' , 
         help= " Help to create snapshots of all volumes") # snapshots inside instances to create snapshots 
 @click.option('--project', default=None,
@@ -122,7 +127,10 @@ def create_snapshot(project):
             i.wait_until_running() #important feature to avoid a mess with the servers
             print("Running server after  snapshots of {0}".format(i.id))  
     return
-    
+
+
+
+############ this is to create snampshot#################
 
 @instances.command('list')  #a pertenece a cli.group('instances')  
 @click.option('--project', default=None,
@@ -151,8 +159,13 @@ def stop_instances(project):
         
     for i in instances:
         print("Stopping {0}" .format(i.id))
-        i.stop() #here we send the command to stop 
-        
+       
+        try: # in this part is " y try to stop the instance "
+            i.stop() #here we send the command to stop 
+        except botocore.exceptions.ClientError as e:  # we get the exception and we gave it another name with the e then we print it 
+            print("Cloud not stop {0}".format(i.id) + str(e)) # we only catch this exception
+            continue
+            
     return
     
 @instances.command('start')  # its a grup that stops the VMs . under click // pertenece a cli.group('instances')
@@ -165,8 +178,12 @@ def stop_instances(project):
         
     for i in instances:
         print("Starting {0}" .format(i.id))
-        i.start() #here we send the command to start 
         
+        try: # in this part is " y try to start the instance "
+            i.start() #here we send the command to start 
+        except botocore.exceptions.ClientError as e:  # we get the exception and we gave it another name with the e then we print it 
+            print("Cloud not start {0}".format(i.id) + str(e)) # we only catch this exception
+            continue
     return
 #-------------THIS IS Instances Group ------------------------------------------------#---------------
  
