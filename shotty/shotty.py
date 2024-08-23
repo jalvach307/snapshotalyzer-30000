@@ -39,7 +39,9 @@ def snapshots():
 @snapshots.command('list')  #a pertenece a cli.group('snapshots')  
 @click.option('--project', default=None,
     help="Only instances for project (tag Project:<name>)")
-def list_volumes(project):
+@click.option('--all', 'list_all', default=False, is_flag=True, ## here the code is --all is there list_ would we true , and not the default one
+    help="List all snapshots for each volume , not just the most recent")
+def list_snapshots(project, list_all):
     "List EC2 VOLUMES"
    
     instances = filter_instances(project)
@@ -55,7 +57,7 @@ def list_volumes(project):
                 s.progress,
                 
             )))
-            
+            if s.state == 'completed' and not list_all: break  # With this command we only show the most recent snapshots  si es igual a completed and no es ist not_all
             
     return 
     
